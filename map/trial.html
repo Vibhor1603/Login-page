@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <!-- Include Google Fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700&display=swap">
+    <!-- Include Bootstrap for modal -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <style>
+        /* Custom CSS for popup */
+        .custom-popup {
+            width: 300px; /* Maximum width of the popup */
+            min-height: 400px; /* Minimum height of the popup */
+            padding: 10px; /* Add padding to all sides */
+            font-family: 'Open Sans', sans-serif; /* Use Google Fonts for text */
+            text-align: center; /* Center-align text */
+        }
+
+        .custom-popup img {
+            max-width: 100%; /* Ensure the image doesn't exceed the width of the popup */
+            max-height: 100%; /* Ensure the image doesn't exceed the height of the popup */
+            width: auto; /* Set the width of the image to fit content */
+            height: auto; /* Set the height of the image to fit content */
+        }
+
+        /* Increase the size of the popup */
+        .larger-popup {
+            max-width: 600px !important;
+            min-height: 700px !important;
+            padding: 10px !important;
+        }
+
+        /* Adjust the dimensions of the map container */
+        #map-container {
+            width: 70vw; /* Set the width of the map container to 70% of the viewport width */
+            height: 80vh; /* Set the height to 70% of the viewport height */
+            position: absolute;
+            top: 50%;
+            left: 50%; /* Center the map horizontally */
+            transform: translate(-50%, -50%); /* Center the map vertically and horizontally */
+        }
+
+        #map {
+            width: 100%;
+            height: 100%;
+            margin-top: 50px;
+        }
+
+        /* Banner styles */
+        .banner {
+            background-color: #f0d465; /* Background color for the banner */
+            color: white; /* Text color */
+            display: flex; /* Make the banner content flex */
+            align-items: center;
+            justify-content: space-between; /* Space between logo and button */
+            padding: 10px; /* Add padding to the banner */
+        }
+
+        .logo {
+            max-width: 100px; /* Adjust the maximum width of the logo */
+            margin-right: 0px; /* Add some space between the logo and text */
+            padding: 0px;
+        }
+
+        .start-drive-button {
+            background-color: #007BFF; /* Button background color */
+            color: white; /* Button text color */
+            padding: 8px 16px; /* Padding for the button */
+            border: 2px solid white; /* Remove button border */
+            cursor: pointer; /* Add pointer cursor on hover */
+        }
+
+        /* Status bar styles */
+        .status-bar {
+            background-color: #ccc; /* Default background color */
+            height: 20px; /* Height of the status bar */
+            border: 1px solid #888; /* Border for the status bar */
+            margin-top: 10px; /* Margin from the top of the popup */
+            width: 100%; /* Set the width of the status bar */
+        }
+
+        .status-fill {
+            height: 100%; /* Fill the entire height of the status bar */
+        }
+
+        /* Style for the form inputs */
+        .form-group {
+            text-align: left;
+        }
+
+        /* Style for the submit button */
+        .submit-button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+    </style>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+</head>
+<body>
+    <div class="banner">
+        <img src="../Login_v1/Upkritlogo.jpg" alt="Logo" class="logo">
+        <h1>Join a cleanup drive</h1>
+        <button class="btn btn-primary start-drive-button" data-toggle="modal" data-target="#joinFormModal">Join</button>
+    </div>
+    <div id="map-container">
+        <div id="map"></div>
+    </div>
+    <!-- Modal for the Join form -->
+    <div class="modal fade" id="joinFormModal" tabindex="-1" role="dialog" aria-labelledby="joinFormModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="joinFormModalLabel">Join the Cleanup Drive</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- Add your form here -->
+                    <form id="cleanupForm">
+                        <div class="form-group">
+                            <label for="name">Name:</label>
+                            <input type="text" class="form-control" id="name" placeholder="Enter your name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Phone Number:</label>
+                            <input type="tel" class="form-control" id="phone" placeholder="Enter your phone number" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Do you want to get a reminder notification from us?</label>
+                            <div class="form-check">
+                                <input type="radio" class="form-check-input" id="reminderYes" name="reminder" value="Yes">
+                                <label class="form-check-label" for="reminderYes">Yes</label>
+                            </div>
+                            <div class="form-check">
+                                <input type="radio" class="form-check-input" id="reminderNo" name="reminder" value="No">
+                                <label class="form-check-label" for="reminderNo">No</label>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary submit-button">Submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        var map = L.map('map').setView([51.505, -0.09], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        // Function to generate a random location close to the user's current location
+        function generateRandomLocation(currentLat, currentLon) {
+            // Adjust these values to control the range of the random location
+            var range = 0.02; // For example, 0.01 degrees (approximately 1.1 km)
+
+            // Generate random latitude and longitude within the specified range
+            var newLat = currentLat + (Math.random() * (2 * range) - range);
+            var newLon = currentLon + (Math.random() * (2 * range) - range);
+
+            return { lat: newLat, lon: newLon };
+        }
+
+        // Function to generate random text (you can replace this with your method)
+        function generateRandomText() {
+            var texts = [
+                "John Doe",
+                "Jane Smith",
+                "Community Cleanup Team",
+                "Green Earth Foundation"
+            ];
+            var randomIndex = Math.floor(Math.random() * texts.length);
+            return texts[randomIndex];
+        }
+
+        // Get the user's current location
+        navigator.geolocation.getCurrentPosition(function (position) {
+            var userLat = position.coords.latitude;
+            var userLon = position.coords.longitude;
+
+            // Create a marker for the user's location with a different icon
+            var userMarker = L.marker([userLat, userLon], {
+                icon: L.divIcon({
+                    className: 'user-marker',
+                    html: '<i class="fas fa-user fa-3x"></i>', // Use Font Awesome for the user icon and increase size
+                    iconSize: [30, 30] // Adjust the size of the marker
+                })
+            }).addTo(map);
+
+            // Create a custom popup for the user's location
+            var userPopupContent = `<h3>Your Location</h3><p>Latitude: ${userLat}<br>Longitude: ${userLon}</p>`;
+            userMarker.bindPopup(userPopupContent, {
+                className: 'custom-popup' // Apply the custom CSS class to the popup
+            }).openPopup();
+
+            // Center the map on the user's location
+            map.setView([userLat, userLon], 13);
+
+            // Generate random locations close to the user's current location
+            var randomLocation1 = generateRandomLocation(userLat, userLon);
+            var randomLocation2 = generateRandomLocation(userLat, userLon);
+            var randomLocation3 = generateRandomLocation(userLat, userLon);
+
+            // Create markers for the random locations with the dustbin icon and custom popup
+            createDustbinMarker(randomLocation1, 10); // For example, 10 people have joined
+            createDustbinMarker(randomLocation2, 20); // For example, 20 people have joined
+            createDustbinMarker(randomLocation3, 30); // For example, 30 people have joined
+
+            // Generate random locations close to the user's current location for red exclamation markers
+            var redLocation1 = generateRandomLocation(userLat, userLon);
+            var redLocation2 = generateRandomLocation(userLat, userLon);
+
+            // Create markers for the red exclamation locations with custom popup
+            createRedExclamationMarker(redLocation1);
+            createRedExclamationMarker(redLocation2);
+        }, function (error) {
+            // Handle geolocation error
+            console.error('Error getting geolocation:', error.message);
+        });
+
+        // Function to create a dustbin marker and its custom popup
+        function createDustbinMarker(location, peopleJoined) {
+            var marker = L.marker([location.lat, location.lon], {
+                icon: L.divIcon({
+                    className: 'custom-marker',
+                    html: '<i class="fas fa-trash-alt fa-3x"></i>', // Use Font Awesome for the dustbin icon and increase size
+                    iconSize: [30, 30] // Adjust the size of the marker
+                })
+            }).addTo(map);
+
+            // Replace the random image with "cleanup.jpg"
+            var randomImage = 'cleanup.jpg'; // Replace with your image URL
+
+            // Add text "organized by: (some random text)"
+            var organizedByText = "organized by: " + generateRandomText();
+
+            // Generate a random date from now to 2 weeks in the future
+            var currentDate = new Date();
+            var futureDate = new Date(currentDate.getTime() + Math.random() * 12096e5); // 12096e5 milliseconds = 2 weeks
+            var eventDate = futureDate.toDateString();
+
+            var popupContent = `
+                <img src="${randomImage}" alt="Cleanup Image">
+                <h3 style="font-size: 18px; margin: 10px 0;">People joined: ${peopleJoined} out of 30</h3>
+                <div class="status-bar" style="background-color: ${getStatusColor(peopleJoined)};">
+                    <div class="status-fill" style="width: ${getStatusBarWidth(peopleJoined)}%;"></div>
+                </div>
+                <p style="font-size: 16px;">${organizedByText}</p> <!-- Add organized by text here -->
+                <p style="font-size: 16px;">Date of event: ${eventDate}</p> <!-- Display the date of the event -->
+                <div style="text-align: center;"> <!-- Center-align the button -->
+                    <button class="btn btn-primary join-button" data-toggle="modal" data-target="#joinFormModal">Join</button>
+                </div>
+            `;
+
+            marker.bindPopup(popupContent, {
+                className: 'custom-popup larger-popup' // Apply both custom CSS classes to the popup
+            });
+
+            // Add an event listener to reposition the marker when the popup is closed
+            marker.on('popupclose', function () {
+                map.setView([location.lat, location.lon], 13);
+            });
+
+            // Handle form submission
+            $('#cleanupForm').submit(function (event) {
+                event.preventDefault();
+                var formData = {
+                    name: $('#name').val(),
+                    phone: $('#phone').val(),
+                    reminder: $("input[name='reminder']:checked").val(),
+                };
+                // You can send the form data to your server or process it as needed here
+                console.log(formData);
+                alert('Form submitted successfully');
+                $('#joinFormModal').modal('hide'); // Close the modal
+            });
+        }
+
+        // Function to create a marker with a red exclamation icon and its custom popup
+        function createRedExclamationMarker(location) {
+            var marker = L.marker([location.lat, location.lon], {
+                icon: L.divIcon({
+                    className: 'custom-marker',
+                    html: '<i class="fas fa-exclamation-triangle fa-3x" style="color: red;"></i>', // Red exclamation icon
+                    iconSize: [30, 30] // Adjust the size of the marker
+                })
+            }).addTo(map);
+
+            // Add text "organized by: (some random text)"
+            var organizedByText = "complaint raised";
+
+            // Generate a random date from now to 2 weeks in the future
+            var currentDate = new Date();
+            var futureDate = new Date(currentDate.getTime() + Math.random() * 12096e5); // 12096e5 milliseconds = 2 weeks
+            var eventDate = futureDate.toDateString();
+
+            var popupContent = `
+                <h3 style="font-size: 18px; margin: 10px 0;">Emergency Event</h3>
+                <p style="font-size: 16px;">${organizedByText}</p> <!-- Add organized by text here -->
+                <p style="font-size: 16px;">Date of event: ${eventDate}</p> <!-- Display the date of the event -->
+                <div style="text-align: center;"> <!-- Center-align the button -->
+                    <button class="btn btn-primary join-button" data-toggle="modal" data-target="#joinFormModal">Join</button>
+                </div>
+            `;
+
+            marker.bindPopup(popupContent, {
+                className: 'custom-popup larger-popup' // Apply both custom CSS classes to the popup
+            });
+
+            // Add an event listener to reposition the marker when the popup is closed
+            marker.on('popupclose', function () {
+                map.setView([location.lat, location.lon], 13);
+            });
+
+            // Handle form submission
+            $('#cleanupForm').submit(function (event) {
+                event.preventDefault();
+                var formData = {
+                    name: $('#name').val(),
+                    phone: $('#phone').val(),
+                    reminder: $("input[name='reminder']:checked").val(),
+                };
+                // You can send the form data to your server or process it as needed here
+                console.log(formData);
+                alert('Form submitted successfully');
+                $('#joinFormModal').modal('hide'); // Close the modal
+            });
+        }
+
+        // Function to handle the "Join" button click
+        function joinEvent() {
+            // Clear the form fields when the modal is opened
+            $('#cleanupForm')[0].reset();
+        }
+
+        // Function to get the color for the status bar based on the percentage of people joined
+        function getStatusColor(peopleJoined) {
+            var percentage = (peopleJoined / 30) * 100; // Calculate the percentage
+            if (percentage >= 70) {
+                return 'green'; // If 70% or more people joined, color it green
+            } else if (percentage >= 40) {
+                return 'yellow'; // If 40% or more people joined, color it yellow
+            } else {
+                return 'red'; // If less than 40% people joined, color it red
+            }
+        }
+
+        // Function to get the width of the status bar based on the percentage of people joined
+        function getStatusBarWidth(peopleJoined) {
+            return (peopleJoined / 30) * 100; // Calculate the percentage and set as width
+        }
+    </script>
+    <!-- Include Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</body>
+</html>
